@@ -1,0 +1,2 @@
+# TradingviewList
+Import Tool
