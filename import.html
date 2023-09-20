@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>文字轉換工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #inputText {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #fileNameInput {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #convertButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tradingview 匯入工具</h1>
+    <textarea id="inputText" placeholder="請輸入觀察清單"></textarea>
+    <br>
+    <label for="conversionType">選擇轉換類型：</label>
+    <select id="conversionType">
+        <option value="crypto">加密貨幣</option>
+        <option value="taiwanStock">台股</option>
+    </select>
+    <br>
+    <input type="text" id="fileNameInput" placeholder="輸入文件名 (留空使用日期)">
+    <br>
+    <button id="convertButton">轉換</button>
+
+    <script>
+        document.getElementById("convertButton").addEventListener("click", function() {
+            // 獲取輸入的文字
+            var inputText = document.getElementById("inputText").value;
+
+            // 獲取轉換類型
+            var conversionType = document.getElementById("conversionType").value;
+
+            // 定義不同的轉換邏輯
+            var convertedText = "";
+            if (conversionType === "crypto") {
+                convertedText = inputText.replace(/(\w+)/g, 'BINANCE:$1USDT.P');
+			} else if (conversionType === "taiwanStock") {
+				var numbers = inputText.match(/\d+/g); // 使用正則表達式捕獲數字部分
+				if (numbers) {
+					convertedText = "TWSE:" + numbers.join(", TWSE:");
+				}
+			}
+
+            // 獲取文件名輸入框的值
+            var fileName = document.getElementById("fileNameInput").value.trim();
+
+            // 如果文件名為空，使用當前日期作為文件名
+            if (fileName === "") {
+                var today = new Date();
+                fileName = today.toISOString().split("T")[0] + ".txt";
+            } else {
+                fileName += ".txt"; // 添加文件擴展名
+            }
+
+            // 創建一個Blob對象以保存轉換後的文字
+            var blob = new Blob([convertedText], { type: "text/plain;charset=utf-8" });
+
+            // 創建一個a標籤元素，自動觸發點擊以下載文件
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = fileName;
+            a.style.display = "none";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>
