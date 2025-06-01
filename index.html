@@ -51,8 +51,17 @@
             // 定義不同的轉換邏輯
             var convertedText = "";
             if (conversionType === "crypto") {
-                convertedText = inputText.replace(/(\w+)/g, 'BINANCE:$1USDT.P');
-			} else if (conversionType === "taiwanStock") {
+                var matches = inputText.match(/\b[A-Z0-9]+(?=\s*\()/g); // 抓 BTCDOM(3.96)
+                if (!matches) {
+                    matches = inputText.match(/\b[A-Z0-9]+\b/g); // fallback：BTCDOM, DEXE, LPT
+                }
+
+                if (matches) {
+                    // 避免重複
+                    var uniqueSymbols = [...new Set(matches)];
+                    convertedText = uniqueSymbols.map(symbol => `BINANCE:${symbol}USDT.P`).join(", ");
+                }
+            } else if (conversionType === "taiwanStock") {
 				var numbers = inputText.match(/\d+/g); // 使用正則表達式捕獲數字部分
 				if (numbers) {
 					convertedText = "TWSE:" + numbers.join(", TWSE:");
